@@ -5,6 +5,10 @@ interface RouteParams {
   articleSlug: string;
 }
 
+// For future improvement:
+// To reduce API calls, we should cache the translated articles for a certain period of time
+// or store in Mongo...
+
 export async function GET(
   request: Request,
   { params }: { params: RouteParams }
@@ -14,6 +18,7 @@ export async function GET(
   }
   const { language, articleSlug } = params;
 
+  // Scraping the article from the website, via api route
   try {
     const articleResponse = await fetch(
       `${process.env.BASE_URL}/api/scrape/${articleSlug}`
@@ -22,6 +27,7 @@ export async function GET(
       throw new Error(`Failed to fetch article: ${articleResponse.statusText}`);
     }
 
+    // Translate the article
     const articleText = await articleResponse.text();
 
     const translator = new deepl.Translator(process.env.DEEPL_API_KEY);
