@@ -18,6 +18,12 @@ export async function GET(
   }
   const { language, articleSlug } = params;
 
+  console.log(
+    "parameters from article with translation",
+    language,
+    articleSlug
+  );
+
   // Scraping the article from the website, via api route
   try {
     const articleResponse = await fetch(
@@ -28,18 +34,56 @@ export async function GET(
     }
 
     // Translate the article
-    const articleText = await articleResponse.text();
+    const articleText = await articleResponse.json();
+    console.log("articleText", articleText);
+
+    const articleAsArray = [
+      articleText.article[0].title,
+      articleText.article[0].articleDescription,
+      articleText.article[0].imageDescription,
+      articleText.article[0].imageCaption,
+      articleText.article[0].textContent,
+    ];
+
+    const articleImage = articleText.article[0].image;
+
+    const woerterBuch = articleText.woerterBuch.map(
+      (entry: {
+        woerterBuchEintragTitel: string;
+        woerterBuchEintragDescription: string;
+      }) => {
+        return `${entry.woerterBuchEintragTitel}: ${entry.woerterBuchEintragDescription}`;
+      }
+    );
 
     const translator = new deepl.Translator(process.env.DEEPL_API_KEY);
     const translatedArticle = await translator.translateText(
-      articleText,
+      articleAsArray,
       null,
       language
     );
 
-    return new Response(JSON.stringify({ translatedArticle }), {
-      headers: { "Content-Type": "application/json" },
-    });
+    const rebuiltTranslatedArticle = {
+      title: translatedArticle[0],
+      articleDescription: translatedArticle[1],
+      imageDescription: translatedArticle[2],
+      imageCaption: translatedArticle[3],
+      textContent: translatedArticle[4],
+      articleImage,
+    };
+
+    const translatedWoertbuch = await translator.translateText(
+      woerterBuch,
+      null,
+      language
+    );
+
+    return new Response(
+      JSON.stringify({ rebuiltTranslatedArticle, translatedWoertbuch }),
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   } catch (error) {
     console.error(error);
     return new Response("Error processing request", { status: 500 });

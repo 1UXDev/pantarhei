@@ -1,95 +1,117 @@
+"use client";
+
 import Image from "next/image";
 import styles from "./page.module.css";
+import { useState, useEffect } from "react";
+import { set } from "mongoose";
 
 export default function Home() {
+  const [article, setArticle] = useState("");
+  const [language, setLanguage] = useState("select");
+  const [translatedArticle, setTranslatedArticle] = useState({});
+  const [translatedWoerterbuch, setTranslatedWoerterbuch] = useState([]);
+  const [articleList, setArticleList] = useState([]);
+
+  function handleSubmit(e: any) {
+    e.preventDefault();
+
+    fetchArticle();
+    e.target.reset();
+  }
+
+  async function fetchArticle() {
+    if (language === "select" || !article) {
+      return alert("Please select a language & an article");
+    }
+    try {
+      const response = await fetch(`/api/scrape/${article}/${language}`);
+      const data = await response.json();
+      setTranslatedArticle(data.rebuiltTranslatedArticle);
+      setTranslatedWoerterbuch(data.translatedWoerterbuch);
+      console.log(data);
+    } catch (error) {
+      console.error("Error fetching article:", error);
+    }
+  }
+
+  async function fetchArticleList() {
+    const fetchedArticles = await fetch("/api/scrape");
+    const data = await fetchedArticles.json();
+    setArticleList(data);
+    console.log(data);
+  }
+
+  useEffect(() => {
+    fetchArticleList();
+  }, []);
+
+  useEffect(() => {
+    console.log(translatedArticle);
+  }, [translatedArticle]);
+
+  useEffect(() => {
+    console.log(article);
+    console.log(language);
+  }, [article, language]);
+
   return (
     <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+      <div className={styles.articleListSectionScrollContainer}>
+        <section className={styles.articleListSection}>
+          {articleList.articleList ? (
+            articleList.articleList.map((oneArticle, index) => (
+              <article
+                key={index}
+                onClick={() => setArticle(oneArticle.slug)}
+                className={`${
+                  oneArticle.slug === article ? styles.selected : null
+                }`}
+              >
+                <img src={oneArticle.image} alt={oneArticle.imageDescription} />
+                <h2>{oneArticle.title}</h2>
+                <p>{oneArticle.articleDescription}</p>
+              </article>
+            ))
+          ) : (
+            <p>Loading...</p>
+          )}
+        </section>
+      </div>
+
+      <section>
+        <form onSubmit={(e) => handleSubmit(e)}>
+          <input
+            placeholder="put the articles url here"
+            onChange={(e) => setArticle(e.target.value)}
+          ></input>
+          <select
+            value={language}
+            onChange={(e) => setLanguage(e.target.value)}
           >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+            <option value="select">Select Language</option>
+            <option value="es">Spanish</option>
+            <option value="de">German</option>
+            <option value="fr">French</option>
+            <option value="it">Italian</option>
+            <option value="nl">Dutch</option>
+            <option value="pl">Polish</option>
+            <option value="pt">Portuguese</option>
+          </select>
+          <button type="submit">get Article</button>
+        </form>
+      </section>
+      <section className={styles.translatedArticle}>
+        {translatedArticle.title ? (
+          <article>
+            <h1>{translatedArticle.title.text}</h1>
+            <img src={translatedArticle.articleImage} alt="article image" />
+            <span> {translatedArticle.imageCaption.text}</span>
+            <p>{translatedArticle.textContent.text}</p>
+          </article>
+        ) : (
+          <p>Select an Article & a Language to Start</p>
+        )}
+      </section>
     </main>
   );
 }

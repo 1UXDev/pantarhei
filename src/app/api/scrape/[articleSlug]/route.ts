@@ -19,6 +19,7 @@ export async function GET(
   request: Request,
   { params: { articleSlug } }: { params: { articleSlug: string } }
 ) {
+  console.log(articleSlug);
   try {
     const url = `https://nachrichtenleicht.de/${articleSlug}`;
     const response = await axios.get(url);
@@ -66,6 +67,7 @@ export async function GET(
         woerterBuchEintragDescription,
       });
     });
+    console.log("article without translation", article);
 
     return Response.json({ article: article, woerterBuch: woerterBuch });
   } catch (error) {
