@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const Words = new mongoose.Schema({
+const WordsSchema = new mongoose.Schema({
   indexKey: String,
   spanish: {
     word: String,
@@ -20,4 +20,4 @@ const Words = new mongoose.Schema({
   ],
 });
 
-export default mongoose.models.Words || mongoose.model("Words", Words);
+export default mongoose.models.Words || mongoose.model("Words", WordsSchema);
