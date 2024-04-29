@@ -1,27 +1,38 @@
 import Image from "next/image";
 import Link from "next/link";
+import { Article } from "@/utils/types/Article";
+import { useEffect, useState } from "react";
 
-type Article = {
-  slug: string;
-  title: string;
-  articleDescription: string;
-  image: string;
-  imageDescription: string;
-};
+export default function HomeArticleCard({
+  article,
+  selectedLanguage,
+}: {
+  article: Article;
+  selectedLanguage: string;
+}) {
+  const [articleInLanguage, setArticleInLanguage] = useState({});
+  const [title, imageDescription, articleDescription] =
+    articleInLanguage?.articleTeaser;
 
-// Correctly typed function parameter
-export default function HomeArticleCard({ article }: { article: Article }) {
+  useEffect(() => {
+    setArticleInLanguage(
+      article.textContent.find(
+        (textContent) => textContent.articleLanguage === selectedLanguage
+      )
+    );
+  }, selectedLanguage);
+
   return (
-    <Link href={`/article/${article.slug}`}>
+    <Link href={`/article/${article.slug}/`}>
       <article>
-        <h2>{article.title}</h2>
-        <p>{article.articleDescription}</p>
         <Image
-          src={article.image}
-          alt={article.imageDescription}
+          src={article.articleImage}
+          alt={imageDescription}
           width={300}
           height={300}
         />
+        <h2>{title}</h2>
+        <p>{articleDescription}</p>
       </article>
     </Link>
   );

@@ -29,8 +29,6 @@ export async function GET(request: Request) {
     await dbConnect();
     const allArticlesFromDB = await Articles.find();
 
-    console.log("allArticlesFromDB:", allArticlesFromDB);
-
     return new Response(JSON.stringify(allArticlesFromDB), {
       headers: { "Content-Type": "application/json" },
     });

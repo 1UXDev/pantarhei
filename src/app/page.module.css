@@ -3,7 +3,7 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  padding: 6rem;
+  padding: 3vw;
   min-height: 100vh;
 }
 
@@ -52,6 +52,8 @@
   background: rgba(var(--card-rgb), 0);
   border: 1px solid rgba(var(--card-border-rgb), 0);
   transition: background 200ms, border 200ms;
+  height: max-content;
+  opacity: 0.5;
 }
 
 .card span {
@@ -242,6 +244,7 @@
   align-items: stretch;
   padding: 1rem;
   gap: 24px;
+  color: black;
 }
 
 .articleListSection article {
@@ -256,6 +259,7 @@
   background-color: rgba(253, 253, 253, 1);
   transition: background 200ms, border 200ms;
   min-height: 300px;
+  height: 100%;
   transition: 0.2s all ease-in-out;
 }
 

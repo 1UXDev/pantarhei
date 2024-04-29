@@ -1,5 +1,7 @@
 import axios from "axios";
 import cheerio, { CheerioAPI } from "cheerio";
+import Articles from "@/app/utils/db/models/Articles";
+import dbConnect from "@/app/utils/db/dbConnect";
 
 interface Article {
   title: string;
@@ -68,6 +70,21 @@ export async function GET(
       });
     });
     console.log("article without translation", article);
+
+    //write to database
+    dbConnect();
+    const newArticle = await Articles.create({
+      title: article[0].title,
+      articleDescription: article[0].articleDescription,
+      image: article[0].image,
+      imageDescription: article[0].imageDescription,
+      slug: articleSlug,
+      articleContent: {
+        textContent: article[0].textContent,
+        imageCaption: article[0].imageCaption,
+        woerterBuch: woerterBuch,
+      },
+    });
 
     return Response.json({ article: article, woerterBuch: woerterBuch });
   } catch (error) {

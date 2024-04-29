@@ -1,31 +1,30 @@
 import mongoose, { Schema } from "mongoose";
-import TranslatedArticles from "./TranslatedArticles";
 
 const ArticlesSchema = new Schema({
-  title: String,
-  articleDescription: String,
-  image: String,
-  imageDescription: String,
+  articleImage: String,
   slug: String,
-  createdAt: { type: Date, default: Date.now },
-  articleContent: {
-    imageCaption: String,
-    textContent: String,
-    woerterBuch: [
-      {
-        woerterBuchEintragTitel: String,
-        woerterBuchEintragDescription: String,
-      },
-    ],
-  },
-  translatedArticle: [
+  textContent: [
     {
       articleLanguage: String,
-      translatedArticleInLanguage: [
-        { articleId: { type: Schema.Types.ObjectId, ref: TranslatedArticles } },
-      ],
+      articleTeaser: {
+        title: String,
+        imageDescription: String,
+        articleDescription: String,
+      },
+      articleContent: {
+        title: String,
+        imageCaption: String,
+        textContent: String,
+        dict: [
+          {
+            oneDictTitle: String,
+            oneDictDescription: String,
+          },
+        ],
+      },
     },
   ],
+  createdAt: { type: Date, default: Date.now },
 });
 
 export default mongoose.models.Articles ||
