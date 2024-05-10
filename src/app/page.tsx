@@ -1,48 +1,39 @@
 import styles from "./page.module.css";
 import HomeArticleCard from "./components/HomeArticleCard/HomeArticleCard";
 import { Article } from "./utils/types/Article";
-import { useEffect, useState } from "react";
 import HomeArticleBody from "./components/HomeArticleCard/HomeArticleBody";
 
-async function getExistingArticles() {
-  const res = await fetch("http://localhost:3000/api/getArticles");
-
+async function fetchArticles(language) {
+  const res = await fetch(`/api/getArticles?lang=${language}`);
   if (!res.ok) {
-    throw new Error("Failed to fetch data");
+    throw new Error("Failed to fetch articles");
   }
-
   return res.json();
 }
 
-export default async function Home() {
-  const [selectedLanguage, setSelectedLanguage] = useState("de-DE");
-  const [articleList, setArticleList] = useState([]);
-  const [selectedArticle, setSelectedArticle] = useState(null);
+export async function getServerData({ params, query }) {
+  // Fetch articles based on the language from the query params or default to 'de-DE'
+  const language = query.lang || "de-DE";
+  const articles = await fetchArticles(language);
+  console.log("articles", articles);
+  return {
+    props: { articles, selectedLanguage: language }, // Pass articles and the selected language as props
+  };
+}
 
-  const data = await getExistingArticles();
-
-  useEffect(() => {
-    //set cookie to selectedLanguage when selectedLanguage changes
-    document.cookie = `PR_selectedLanguage=${selectedLanguage}`;
-
-    setArticleList(
-      data.map((oneArticle) => {
-        return {
-          slug: oneArticle.slug,
-          textContent: textContent.filter((targetText) => {
-            targetText.articleLanguage = selectedLanguage;
-          }),
-        };
-      })
-    );
-  }, [selectedLanguage]);
-
+export default async function Home({ articles, selectedLanguage }) {
+  console.log("articles", articles);
   return (
     <main className={styles.main}>
       <h1>Existing Articles</h1>
       <select
         value={selectedLanguage}
-        onChange={(e) => setSelectedLanguage(e.target.value)}
+        onChange={(e) => {
+          // add language parameter
+          const url = new URL(window.location);
+          url.searchParams.set("lang", e.target.value);
+          window.location.href = url.toString();
+        }}
       >
         <option value="de-DE">German</option>
         <option value="en-US">English</option>
@@ -54,24 +45,34 @@ export default async function Home() {
 
       <div className={styles.articleListSectionScrollContainer}>
         <section className={styles.articleListSection}>
-          {articleList
+          {articles
             .slice()
             .reverse()
-            .map((oneArticle: Article) => (
-              <HomeArticleCard
-                article={oneArticle}
-                selectedLanguage={selectedLanguage}
-                key={oneArticle.slug}
-              />
-            ))}
+            .map((article) => {
+              const articleInLanguage =
+                article.textContent.find(
+                  (textContent) =>
+                    textContent.articleLanguage === selectedLanguage
+                ) || {};
+
+              return (
+                <HomeArticleCard
+                  key={article.slug}
+                  article={article}
+                  title={articleInLanguage.title}
+                  imageDescription={articleInLanguage.imageDescription}
+                  articleDescription={articleInLanguage.articleDescription}
+                />
+              );
+            })}
         </section>
       </div>
-      {selectedArticle && (
+      {/* {selectedArticle && (
         <HomeArticleBody
           selectedArticle={articleList[selectedArticle]}
           selectedLanguage={selectedLanguage}
         />
-      )}
+      )} */}
     </main>
   );
 }

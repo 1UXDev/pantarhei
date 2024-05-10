@@ -1,35 +1,21 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Article } from "@/utils/types/Article";
-import { useEffect, useState } from "react";
 
 export default function HomeArticleCard({
   article,
-  selectedLanguage,
-}: {
-  article: Article;
-  selectedLanguage: string;
+  title,
+  imageDescription,
+  articleDescription,
 }) {
-  const [articleInLanguage, setArticleInLanguage] = useState({});
-  const [title, imageDescription, articleDescription] =
-    articleInLanguage?.articleTeaser;
-
-  useEffect(() => {
-    setArticleInLanguage(
-      article.textContent.find(
-        (textContent) => textContent.articleLanguage === selectedLanguage
-      )
-    );
-  }, selectedLanguage);
-
   return (
     <Link href={`/article/${article.slug}/`}>
       <article>
         <Image
           src={article.articleImage}
-          alt={imageDescription}
+          alt={imageDescription || "Article Image"}
           width={300}
           height={300}
+          unoptimized // You may need this if you are not using a supported CDN
         />
         <h2>{title}</h2>
         <p>{articleDescription}</p>
