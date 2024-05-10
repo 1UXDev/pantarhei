@@ -29,35 +29,41 @@ export async function GET(
   await dbConnect();
 
   const articleToTranslate = await Articles.findOne({ slug: articleSlug });
+
+  // check if article exists
   if (!articleToTranslate) {
     return new Response(false, { status: 404 });
   }
+
+  // check if article is already translated to target lang
   if (
-    articleToTranslate.translatedArticle.find(
+    articleToTranslate.textContent.find(
       (articleInLanguage: any) => articleInLanguage.articleLanguage === language
     )
   ) {
-    return new Response(true);
+    return new Response(false, {
+      status: 409,
+      statusText: "Already translated",
+    });
   }
 
-  const woerterBuch = articleToTranslate.articleContent.woerterBuch.map(
-    (entry: {
-      woerterBuchEintragTitel: string;
-      woerterBuchEintragDescription: string;
-    }) => {
-      return `${entry.woerterBuchEintragTitel}: ${entry.woerterBuchEintragDescription}`;
+  const aTT = articleToTranslate.textContent[0];
+
+  const woerterBuch = aTT.articleContent.dict.map(
+    (entry: { oneDictTitle: string; oneDictDescription: string }) => {
+      return `${entry.oneDictTitle}: ${entry.oneDictDescription}`;
     }
   );
 
   const articleAsArray = [
-    articleToTranslate.title,
-    articleToTranslate.articleDescription,
-    articleToTranslate.imageDescription,
-    articleToTranslate.articleContent.imageCaption,
-    articleToTranslate.articleContent.textContent,
+    aTT.articleContent.title,
+    aTT.articleTeaser.articleDescription,
+    aTT.articleTeaser.imageDescription,
+    aTT.articleContent.imageCaption,
+    aTT.articleContent.textContent,
   ];
 
-  const articleImage = articleToTranslate.image;
+  const articleImage = aTT.articleImage;
 
   const translator = new deepl.Translator(process.env.DEEPL_API_KEY);
   const translatedArticle = await translator.translateText(
@@ -65,79 +71,56 @@ export async function GET(
     null,
     language
   );
-  const translaterWoerterBuch = await translator.translateText(
+  const translatedWoerterBuch = await translator.translateText(
     woerterBuch,
     null,
     language
   );
 
   const rebuiltTranslatedArticle = {
-    title: translatedArticle[0].text,
-    articleDescription: translatedArticle[1].text,
-    imageDescription: translatedArticle[2].text,
-    imageCaption: translatedArticle[3].text,
-    image: articleImage,
-    articleContent: {
-      textContent: translatedArticle[4].text,
-      woerterBuch: translaterWoerterBuch.map((entry: string) => {
-        const oneEntry = entry.text.split(". ");
-
-        const title = oneEntry.shift();
-        const description = oneEntry.join(". ");
-
-        return {
-          woerterBuchEintragTitel: title,
-          woerterBuchEintragDescription: description,
-        };
-      }),
-    },
-  };
-
-  return new Response(
-    await writeTranslatedArticleToDB(
-      rebuiltTranslatedArticle,
-      articleToTranslate,
-      language
-    )
-  );
-}
-
-async function writeTranslatedArticleToDB(
-  translatedArticle: any,
-  articleResponse: any,
-  language: deepl.TargetLanguageCode
-) {
-  try {
-    // writing the new content to TranslatedArticles
-    const newTranslatedArticle = {
-      originalArticleId: articleResponse._id,
-      articleLanguage: language,
-      translatedArticleInLanguage: translatedArticle,
-    };
-
-    const translatedArticleInDB = await TranslatedArticles.create(
-      newTranslatedArticle
-    );
-
-    // console.log("Translated Article in DB:", translatedArticleInDB);
-
-    // writing the new content to the original article
-    const updatedArticle = await Articles.findOneAndUpdate(
-      { _id: articleResponse._id },
+    slug: articleToTranslate.slug,
+    textContent: [
       {
-        $push: {
-          translatedArticle: {
-            articleLanguage: language,
-            translatedArticleInLanguage: translatedArticleInDB._id,
-          },
+        articleLanguage: language,
+        articleImage: articleImage,
+        articleTeaser: {
+          title: translatedArticle[0].text,
+          imageDescription: translatedArticle[2].text,
+          articleDescription: translatedArticle[1].text,
+        },
+        articleContent: {
+          title: translatedArticle[0].text,
+          imageCaption: translatedArticle[3].text,
+          textContent: translatedArticle[4].text,
+          dict: translatedWoerterBuch.map((entry: string) => {
+            const oneEntry = entry.text.split(": ");
+
+            const title = oneEntry.shift();
+            const description = oneEntry.join(": ");
+
+            return {
+              oneDictTitle: title,
+              oneDictDescription: description,
+            };
+          }),
         },
       },
-      { new: true }
-    );
+    ],
+  };
 
-    return true;
-  } catch (error) {
-    console.error("Error occurred while writing to DB:", error);
-    return false;
+  const updatedArticle = await Articles.findOneAndUpdate(
+    { _id: articleToTranslate._id },
+    {
+      $push: {
+        textContent: rebuiltTranslatedArticle.textContent,
+      },
+    },
+    { new: true }
+  );
+
+  if (!updatedArticle) {
+    return new Response(false, { status: 500 });
   }
+
+  return new Response(updatedArticle, { status: 200 });
 }

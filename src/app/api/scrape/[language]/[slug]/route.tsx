@@ -19,23 +19,24 @@ interface AC {
 }
 
 // scrape a specific article
+// --> we do not really need this route anymore
 
-export async function GET(
-  request: Request,
-  { params }: { params: RouteParams }
-) {
-  const { slug, language } = params;
-  await dbConnect();
+// export async function GET(
+//   request: Request,
+//   { params }: { params: RouteParams }
+// ) {
+//   const { slug, language } = params;
+//   await dbConnect();
 
-  const scrapedArticleContent = await scrapeArticle(slug);
-  const updatedArticle = await writeArticleToDB(
-    language,
-    slug,
-    scrapedArticleContent
-  );
+//   const scrapedArticleContent = await scrapeArticle(slug);
+//   const updatedArticle = await writeArticleToDB(
+//     language,
+//     slug,
+//     scrapedArticleContent
+//   );
 
-  return new Response(JSON.stringify(updatedArticle));
-}
+//   return new Response(JSON.stringify(updatedArticle));
+// }
 
 export async function scrapeArticle(slug: string) {
   try {
