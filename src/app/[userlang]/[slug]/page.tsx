@@ -1,16 +1,27 @@
-"use client";
-
-import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import styles from "./page.module.css";
+import { ArticleType } from "@/app/utils/types/Article";
 
-export default function ArticlePage() {
-  const slug = usePathname().split("/").pop();
-  const [dataToUse, setDataToUse] = useState(null);
-  const [articleContent, setArticleContent] = useState(null);
-  const [selectedLanguage, setSelectedLanguage] = useState("de-DE");
+export async function generateStaticParams() {
+  const language = "de-DE";
+
+  const articles = await fetch(
+    `${process.env.BASE_URL}/api/getArticles/${language}`
+  ).then((res) => res.json());
+
+  return articles.map((article: Article) => ({
+    params: { slug: article.slug },
+  }));
+}
+
+export default async function ArticlePage({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  const { slug } = await params;
 
   useEffect(() => {
     console.log("Slug:", slug);

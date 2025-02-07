@@ -1,21 +1,20 @@
 import Image from "next/image";
 import Link from "next/link";
 
-export default function HomeArticleCard({
-  article,
-  title,
-  imageDescription,
-  articleDescription,
-}) {
+export default function HomeArticleCard({ article }) {
+  console.log(article);
+  const { title, articleDescription, imageDescription } =
+    article.textContent[0].articleTeaser;
+
   return (
     <Link href={`/article/${article.slug}/`}>
       <article>
         <Image
-          src={article.articleImage}
+          src={"https://www2.tuhh.de/zll/wp-content/uploads/placeholder.png"}
           alt={imageDescription || "Article Image"}
           width={300}
           height={300}
-          unoptimized // You may need this if you are not using a supported CDN
+          unoptimized // no cdn use, investigate
         />
         <h2>{title}</h2>
         <p>{articleDescription}</p>
