@@ -4,8 +4,8 @@ import { ArticleType } from "../utils/types/Article";
 import Link from "next/link";
 
 export async function generateStaticParams() {
-  const params = languages.map((userlang) => ({
-    userlang: userlang,
+  const params = languages.map((lang) => ({
+    lang: lang,
   }));
 
   return params;
@@ -14,17 +14,17 @@ export async function generateStaticParams() {
 export default async function UserDashboard({
   params,
 }: {
-  params: { userlang: string };
+  params: { lang: string };
 }) {
-  const { userlang } = await params;
+  const { lang } = await params;
   const navigation = [
-    { name: "Home", href: `/${userlang}` },
+    { name: "Home", href: `/${lang}` },
     { name: "All Articles", href: "#" },
     { name: "Your Memos", href: "#" },
   ];
 
   const articles = await fetch(
-    `${process.env.BASE_URL}/api/getAllArticlesInLang/${userlang}`
+    `${process.env.BASE_URL}/api/getAllArticlesInLang/${lang}`
   ).then((res) => res.json());
 
   return (

@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function HomeArticleCard({ article }) {
-  console.log(article);
   const { title, articleDescription, imageDescription } =
     article.textContent[0].articleTeaser;
 

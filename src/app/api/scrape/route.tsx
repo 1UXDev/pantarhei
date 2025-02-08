@@ -11,9 +11,7 @@ export async function GET(request: Request): Promise<Response> {
   async function articleDoesNotExistYet(slug: string) {
     await dbConnect();
 
-    console.log("Checking if article exists in the database");
     const articlesFound = await Articles.findOne({ slug: slug });
-    console.log("articlesFound", articlesFound ? true : false);
 
     return articlesFound === null ? true : false;
   }

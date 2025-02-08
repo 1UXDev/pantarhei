@@ -29,8 +29,6 @@ export default async function ArticlePage({
 }) {
   const { slug, lang } = await params;
 
-  console.log(slug, lang);
-
   const articleContent = await fetch(
     `${process.env.BASE_URL}/api/getArticle/${slug}/${lang}`
   ).then((res) => res.json());

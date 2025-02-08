@@ -102,10 +102,14 @@ export async function translateArticle(
       articleLanguage: language,
     };
 
+    const translatedArticleResponse = await writeTranslatedArticleToDB(
+      rebuiltTranslatedArticle,
+      articleToTranslate
+    );
     return new Response(
-      JSON.stringify(
-        writeTranslatedArticleToDB(rebuiltTranslatedArticle, articleToTranslate)
-      )
+      JSON.stringify({
+        translatedArticle: translatedArticleResponse,
+      })
     );
   } catch (error) {
     console.error("Error occurred while translating:", error);

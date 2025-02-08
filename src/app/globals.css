@@ -9,6 +9,7 @@
   --color-primary: oklch(50.88% 0.234 328.363);
   --color-primary-light: oklch(56.24% 0.258 328.36);
   --color-primary-dark: oklch(32.81% 0.151 328.36);
+  --container-c: "max-w-[1980px] mx-auto px-4 sm:px-8 md:px-12 lg:px-16 xl:px-24 2xl:px-32";
 }
 
 html,
