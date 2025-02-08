@@ -3,7 +3,7 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  padding: 6rem;
+  padding: 3vw;
   min-height: 100vh;
 }
 
@@ -52,6 +52,8 @@
   background: rgba(var(--card-rgb), 0);
   border: 1px solid rgba(var(--card-border-rgb), 0);
   transition: background 200ms, border 200ms;
+  height: max-content;
+  opacity: 0.5;
 }
 
 .card span {
@@ -227,4 +229,99 @@
   to {
     transform: rotate(0deg);
   }
+}
+
+.articleListSectionScrollContainer {
+  width: 100%; /* Adjusted from 100vw to 100% */
+  overflow-x: auto; /* changed from scroll to auto */
+}
+
+.articleListSection {
+  display: flex;
+  flex-direction: row;
+  width: auto;
+  justify-content: space-between;
+  align-items: stretch;
+  padding: 1rem;
+  gap: 24px;
+  color: black;
+}
+
+.articleListSection article {
+  display: flex;
+  flex: 1;
+  min-width: 300px;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: rgba(253, 253, 253, 1);
+  transition: background 200ms, border 200ms;
+  min-height: 300px;
+  height: 100%;
+  transition: 0.2s all ease-in-out;
+}
+
+.articleListSection article.selected {
+  border: 2px solid #0070f3;
+}
+
+.articleListSection article:hover {
+  background-color: rgba(255, 255, 255, 1);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transform: scale(1.03);
+}
+
+.articleListSection img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.translatedArticle article {
+  display: flex;
+  flex: 1;
+  min-width: 300px;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: rgba(253, 253, 253, 1);
+  transition: background 200ms, border 200ms;
+  min-height: 300px;
+  transition: 0.2s;
+}
+
+.translatedArticle article img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.translatedArticle article h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 12px 0;
+}
+.translatedArticle article span {
+  font-size: 0.8rem;
+  color: grey;
+  line-height: 1.3;
+  margin-bottom: 12px;
+  text-align: center;
+  align-self: center;
+}
+
+.translatedArticle article p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 12px;
+  max-width: 600px;
+  text-align: justify;
+  align-self: center;
 }

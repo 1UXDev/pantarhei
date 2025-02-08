@@ -58,6 +58,7 @@ const transformDictionary = (filePath) => {
     }
 
     dictionary[indexKey].push({
+      indexKey,
       spanish,
       german,
       meanings: [{ wordType, moreInfo }],
@@ -73,7 +74,7 @@ const jsonData = transformDictionary(filePath);
 const json = JSON.stringify(jsonData, null, 2);
 
 // Define the path for the new JSON file
-const outputPath = path.join(__dirname, "/../../../dictionary.json");
+const outputPath = path.join(__dirname, "/../../../.dictionary.json");
 
 // Write the JSON string to the file
 fs.writeFileSync(outputPath, json);

@@ -1,4 +1,10 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+
+// include bilder.deutschlandfunk.de in the list of allowed domains
+const nextConfig = {
+  images: {
+    domains: ["bilder.deutschlandfunk.de"],
+  },
+};
 
 export default nextConfig;
