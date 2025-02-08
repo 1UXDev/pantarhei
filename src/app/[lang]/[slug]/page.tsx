@@ -36,7 +36,7 @@ export default async function ArticlePage({
   const articleContent = article.textContent[0].articleContent;
 
   return (
-    <main className="bg-bg min-h-screen">
+    <main className="bg-bg min-h-screen mb-24">
       {articleContent ? (
         <section className="">
           <article>
@@ -49,7 +49,7 @@ export default async function ArticlePage({
                 />
               )}
 
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 z-10 flex flex-col justify-end container-c">
+              <div className="absolute p-8 inset-0 bg-gradient-to-t from-black/80 z-10 flex flex-col justify-end container-c">
                 <div className="text-white/80">
                   <Link href={`/${lang}`}>← Back to Dashboard</Link>
                 </div>
@@ -60,17 +60,19 @@ export default async function ArticlePage({
               </div>
             </div>
 
-            <div className="">
-              <p>{articleContent.articleDescription}</p>
+            <div className="my-8 px-8">
+              <p>{articleContent.textContent}</p>
             </div>
           </article>
+
+          <hr className="border-t border-primary w-1/2 mx-auto my-8" />
+
           <article>
-            <div className="">
-              <h2>Wörterbuch</h2>
-              <ul>
+            <div className="px-8">
+              <ul className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {articleContent.dict.map((entry: DictType) => (
-                  <li key={entry.oneDictTitle}>
-                    <h3>{entry.oneDictTitle}</h3>
+                  <li key={entry.oneDictTitle} className="my-2">
+                    <h3 className="font-bold">{entry.oneDictTitle}</h3>
                     <p>{entry.oneDictDescription}</p>
                   </li>
                 ))}
