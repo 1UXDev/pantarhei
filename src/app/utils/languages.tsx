@@ -2,4 +2,10 @@
 
 import { TargetLanguageCode } from "deepl-node";
 
-export const languages = ["en-GB", "de", "es", "fi"] as TargetLanguageCode[];
+export const languages = [
+  "en-GB",
+  "de",
+  "es",
+  "fi",
+  "fr",
+] as TargetLanguageCode[];

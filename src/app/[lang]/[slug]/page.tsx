@@ -3,31 +3,36 @@ import Image from "next/image";
 import { ArticleType, DictType } from "@/app/utils/types/Article";
 import { languages } from "@/app/utils/languages";
 
-export async function generateStaticParams() {
-  const articles = await fetch(`${process.env.BASE_URL}/api/getArticle`).then(
-    (res) => res.json()
-  );
+// export async function generateStaticParams() {
 
-  const params = articles.flatMap((article: ArticleType) =>
-    languages.map((lang) => ({
-      slug: article.slug,
-      lang: lang,
-    }))
-  );
+//   const articles = await fetch(`${baseUrl}/api/getArticle`).then((res) =>
+//     res.json()
+//   );
 
-  return params;
-}
+//   const params = articles.flatMap((article: ArticleType) =>
+//     languages.map((lang) => ({
+//       slug: article.slug,
+//       lang: lang,
+//     }))
+//   );
+
+//   return params;
+// }
 
 export default async function ArticlePage({
   params,
 }: {
   params: { slug: string; lang: string };
 }) {
-  const { slug, lang } = await params;
+  const { slug, lang } = params;
+
+  console.log(slug, lang);
 
   const article = await fetch(
     `${process.env.BASE_URL}/api/getArticle/${slug}/${lang}`
   ).then((res) => res.json());
+
+  console.log(article);
 
   if (article.error || !article.textContent[0]) {
     return <p>Article not found</p>;

@@ -15,6 +15,9 @@ export async function GET(
   const slug = (await params).slug;
   const lang = (await params).lang;
 
+  console.log("slug", slug);
+  console.log("lang", lang);
+
   if (languages.indexOf(lang) === -1) {
     return new NextResponse(
       JSON.stringify({ error: "Language not supported" }),
@@ -44,6 +47,8 @@ export async function GET(
         },
       }
     );
+
+    console.log("article in Mongo", article);
 
     if (!article) {
       // check if article exists in any language
